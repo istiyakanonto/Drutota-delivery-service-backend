@@ -27,6 +27,7 @@ client.connect((err) => {
   const serviceCollection = client.db("active").collection("fast");
   const reviewCollection = client.db("active").collection("second");
   const orderCollection = client.db("active").collection("third");
+  const adminCollection = client.db("active").collection("fourth");
   console.log("DB connected Successfully");
 
   //get service data(1st Collection)
@@ -44,7 +45,7 @@ client.connect((err) => {
       res.send(result.insertedCount > 0);
     });
   });
-
+//third collection
   app.post("/addProduct", (req, res) => {
     const newProduct = req.body;
     console.log(newProduct);
@@ -55,6 +56,22 @@ client.connect((err) => {
       res.send(items);
     });
   });
+
+  //fourth collection
+
+  app.post("/addAdmin", (req, res) => {
+    const newAdmin = req.body;
+    console.log(newAdmin);
+    adminCollection.insertOne(newAdmin);
+  });
+
+  //fourth collection
+  app.get("/admin", (req, res) => {
+    adminCollection.find().toArray((err, items) => {
+      res.send(items);
+    });
+  });
+
 
   app.get("/allOrder", (req, res) => {
     orderCollection.find().toArray((err, items) => {
