@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient;
-
+const ObjectId = require("mongodb").ObjectID;
 
 const cors = require('cors')
 const bodyParser = require('express')
@@ -41,7 +41,24 @@ app.get("/service", (req, res) => {
       res.send(result.insertedCount > 0);
     });
   });
+ //get data for single service
+ app.get("/serve/:id", (req, res) => {
+    serviceCollection
+      .find({ _id: ObjectId(req.params.id) })
+      .toArray((err, documents) => {
+        res.send(documents);
+      });
+  });
 
+   //delete data for single Service
+   app.delete("/itemDelete/:id", (req, res) => {
+    const id = ObjectId(req.params.id);
+    console.log("Delete this", id);
+    serviceCollection.findOneAndDelete({ _id: id }).then((documents) => {
+      res.send(documents.deleteCount > 0);
+      console.log(documents);
+    });
+  });
 
   //get service data(2nd collection)
   app.get("/review", (req, res) => {
