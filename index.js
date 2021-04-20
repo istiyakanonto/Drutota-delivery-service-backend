@@ -1,41 +1,43 @@
-const express = require('express')
-const app = express()
-const MongoClient = require('mongodb').MongoClient;
+const express = require("express");
+const app = express();
+const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectID;
 
-const cors = require('cors')
-const bodyParser = require('express')
-require('dotenv').config()
-const port = process.env.PORT || 5040
+const cors = require("cors");
+const bodyParser = require("express");
+require("dotenv").config();
+const port = process.env.PORT || 5040;
 //midleWire
 app.use(cors());
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello Istiyak Ahmed!')
-})
+app.get("/", (req, res) => {
+  res.send("Hello Istiyak Ahmed!");
+});
 //My working
 
-
-const uri = `mongodb+srv://${ process.env.DB_USER}:${ process.env.DB_PASS}@cluster0.uplvf.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-console.log(uri)
-client.connect(err => {
-    console.log("Connection Error", err)
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uplvf.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+console.log(uri);
+client.connect((err) => {
+  console.log("Connection Error", err);
   const serviceCollection = client.db("active").collection("fast");
   const reviewCollection = client.db("active").collection("second");
   const orderCollection = client.db("active").collection("third");
-console.log("DB connected Successfully")
+  console.log("DB connected Successfully");
 
-//get service data(1st Collection)
-app.get("/service", (req, res) => {
+  //get service data(1st Collection)
+  app.get("/service", (req, res) => {
     serviceCollection.find().toArray((err, items) => {
       res.send(items);
     });
   });
 
- //post data
- app.post("/addService", (req, res) => {
+  //post data
+  app.post("/addService", (req, res) => {
     const newService = req.body;
     serviceCollection.insertOne(newService).then((result) => {
       //  console.log('inserted Count:',result.insertedCount)
@@ -43,24 +45,25 @@ app.get("/service", (req, res) => {
     });
   });
 
-
-  app.post("/addProduct",(req, res) => {
-    const newProduct=req.body;
+  app.post("/addProduct", (req, res) => {
+    const newProduct = req.body;
     console.log(newProduct);
-    orderCollection.insertOne(newProduct)
-   
-  })
+    orderCollection.insertOne(newProduct);
+  });
   app.get("/order", (req, res) => {
-    orderCollection.find({email: req.query.email}).toArray((err, items) => {
+    orderCollection.find({ email: req.query.email }).toArray((err, items) => {
       res.send(items);
     });
   });
 
-  
+  app.get("/allOrder", (req, res) => {
+    orderCollection.find().toArray((err, items) => {
+      res.send(items);
+    });
+  });
 
-
- //get data for single service
- app.get("/serve/:id", (req, res) => {
+  //get data for single service
+  app.get("/serve/:id", (req, res) => {
     serviceCollection
       .find({ _id: ObjectId(req.params.id) })
       .toArray((err, documents) => {
@@ -68,8 +71,8 @@ app.get("/service", (req, res) => {
       });
   });
 
-   //delete data for single Service
-   app.delete("/itemDelete/:id", (req, res) => {
+  //delete data for single Service
+  app.delete("/itemDelete/:id", (req, res) => {
     const id = ObjectId(req.params.id);
     console.log("Delete this", id);
     serviceCollection.findOneAndDelete({ _id: id }).then((documents) => {
@@ -80,13 +83,13 @@ app.get("/service", (req, res) => {
 
   //get service data(2nd collection)
   app.get("/review", (req, res) => {
-      reviewCollection.find().toArray((err, items) => {
-        res.send(items);
-      });
+    reviewCollection.find().toArray((err, items) => {
+      res.send(items);
     });
+  });
 
   //post data(2nd Collection)
- app.post("/addReview", (req, res) => {
+  app.post("/addReview", (req, res) => {
     const newReview = req.body;
     reviewCollection.insertOne(newReview).then((result) => {
       //  console.log('inserted Count:',result.insertedCount)
@@ -94,24 +97,10 @@ app.get("/service", (req, res) => {
     });
   });
 
-
-// app.post("/addOrder",(req, res) => {
-//     const newOrder=req.body;
-//     orderCollection.insertOne(newOrder).then((err,result) => {})
-//     console.log(result);
-   
-// })
-
-
-//   client.close();
+  //   client.close();
 });
-
-
-
-
-
 
 //port
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+  console.log(`Example app listening at http://localhost:${port}`);
+});
