@@ -24,6 +24,7 @@ client.connect(err => {
     console.log("Connection Error", err)
   const serviceCollection = client.db("active").collection("fast");
   const reviewCollection = client.db("active").collection("second");
+  const orderCollection = client.db("active").collection("third");
 console.log("DB connected Successfully")
 
 //get service data(1st Collection)
@@ -41,6 +42,23 @@ app.get("/service", (req, res) => {
       res.send(result.insertedCount > 0);
     });
   });
+
+
+  app.post("/addProduct",(req, res) => {
+    const newProduct=req.body;
+    console.log(newProduct);
+    orderCollection.insertOne(newProduct)
+   
+  })
+  app.get("/order", (req, res) => {
+    orderCollection.find({email: req.query.email}).toArray((err, items) => {
+      res.send(items);
+    });
+  });
+
+  
+
+
  //get data for single service
  app.get("/serve/:id", (req, res) => {
     serviceCollection
@@ -67,7 +85,7 @@ app.get("/service", (req, res) => {
       });
     });
 
-  //post data
+  //post data(2nd Collection)
  app.post("/addReview", (req, res) => {
     const newReview = req.body;
     reviewCollection.insertOne(newReview).then((result) => {
@@ -75,6 +93,16 @@ app.get("/service", (req, res) => {
       res.send(result.insertedCount > 0);
     });
   });
+
+
+// app.post("/addOrder",(req, res) => {
+//     const newOrder=req.body;
+//     orderCollection.insertOne(newOrder).then((err,result) => {})
+//     console.log(result);
+   
+// })
+
+
 //   client.close();
 });
 
